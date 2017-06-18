@@ -109,14 +109,12 @@ class PendingController extends AdminController {
 		//更新数据库
 		$re = M ( 'Withdraw' )->where ( "withdraw_id = '{$id}'" )->save ( $data );
 		$num= M ( 'Withdraw' )->where ( "withdraw_id = '{$id}'" )->find ();
-		M('Member')->where("member_id={$num['uid']}")->setDec('forzen_rmb',$num['all_money']*2);
+		M('Member')->where("member_id={$num['uid']}")->setDec('forzen_rmb',$num['all_money']);
 		if($re == false){
 			$datas['status'] = 0;
 			$datas['info'] = "提现操作失败";
 			$this->ajaxReturn($datas);
 		}
-		//加入huge_mt4资金
-		M('member')->where("member_id={$num['uid']}")->setInc('huge_mt4',$num['all_money']/$this->config['utr']);//注意是美元
 		$this->addMessage_all($info['member_id'],-2,'CNY提现成功',"恭喜您提现{$info['all_money']}成功！");
 		$this->addFinance($info['member_id'],23,"提现{$info['all_money']}",$info['all_money']-$info['withdraw_fee'],2,0);
 		$datas['status'] = 1;

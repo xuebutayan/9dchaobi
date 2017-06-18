@@ -693,7 +693,7 @@ class UserController extends HomeController
         }
         $this->assign('alps_info',$info);
         $this->assign('radio',$radio);
-        $this->assign('num',$num+$this->auth['alps_mt4']);
+        $this->assign('num',$num);
         $this->assign('utr',$this->config['utr']);
         $this->display();
     }
@@ -714,12 +714,12 @@ class UserController extends HomeController
             $info['info']   = "交易密码不正确";
             $this->ajaxReturn($info);
         }
+        if ($data['amount'] > $currency_u['num']) {
+            $info['status'] = 0;
+            $info['info']   = "交易数量大于账户余额";
+            $this->ajaxReturn($info);
+        }
         if($post['platform']=='alpsemall'){
-            if ($data['amount'] > $currency_u['num']) {
-                $info['status'] = 0;
-                $info['info']   = "交易数量大于账户余额";
-                $this->ajaxReturn($info);
-            }
             if (empty($uinfo['user_id'])) {
                 $info['status'] = 0;
                 $info['info']   = "您不是代理会员，不能转出";
@@ -727,11 +727,6 @@ class UserController extends HomeController
             }
         }
         elseif($post['platform']=='waihui'){
-            if ($data['amount'] > ($currency_u['num']+$this->auth['alps_mt4'])) {
-                $info['status'] = 0;
-                $info['info']   = "交易数量大于账户余额";
-                $this->ajaxReturn($info);
-            }
             if (empty($uinfo['login'])) {
                 $info['status'] = 0;
                 $info['info']   = "您还没有激活外汇平台帐号！";
@@ -786,14 +781,8 @@ class UserController extends HomeController
             if($post['platform']=='waihui') $data['money'] = floatval($data['money']/$this->config['utr']*2);
             else $data['money'] = floatval($data['money']/$this->config['utr']);
             M('alps_log')->add($data);
-            //帐号alps币扣减,alps_mt4优先扣减
-            if($data['amount']>$this->auth['alps_mt4'] && $this->auth['alps_mt4']>0){
-                M('member')->where(['member_id'=>$member_id])->setDec('alps_mt4',$this->auth['alps_mt4']);
-                M('currency_user')->where("member_id=$member_id")->setDec('num',$data['amount']-$this->auth['alps_mt4']);
-            }elseif($data['amount']<=$this->auth['alps_mt4']){
-                M('member')->where(['member_id'=>$member_id])->setDec('alps_mt4',$data['amount']);
-            }else M('currency_user')->where("member_id=$member_id")->setDec('num',$data['amount']);
-
+            //帐号alps币扣减
+            M('currency_user')->where("member_id=$member_id")->setDec('num',$data['amount']);
             $info['status'] = 1;
             $info['info']   = "操作成功！";
             $this->ajaxReturn($info);
@@ -848,15 +837,6 @@ class UserController extends HomeController
         $mem_data = $member->field('pwdtrade,rmb,forzen_rmb')->where($where)->find();
         //交易密码
         if (IS_POST) {
-            //一天只允许提现一次
-            $start_time = strtotime(date('Y-m-d',time()));
-            $end_time = $start_time+86400;
-            $re = $withdraw->where(['uid'=>session('USER_KEY_ID'),'add_time'=>['between',$start_time.','.$end_time]])->find();
-            if($re){
-                $info['status'] = 0;
-                $info['info']   = "每天只允许提现一次";
-                $this->ajaxReturn($info);
-            }
             $data['bank_id']   = I('post.select_bank');
             $data['all_money'] = floatval(I('post.money')); //提现金额
             $data['pwdtrade']  = md5(I('post.pwdtrade'));
@@ -870,13 +850,13 @@ class UserController extends HomeController
                 $info['info']   = "请填写提现金额";
                 $this->ajaxReturn($info);
             }
-            //单笔在100至100000在之间
-            if ($data['all_money'] < 100 || $data['all_money'] > 100000) {
+            //单笔在100至50000在之间
+            if ($data['all_money'] < 10 || $data['all_money'] > 500000) {
                 $info['status'] = 2;
                 $info['info']   = "提现金额超出限制";
                 $this->ajaxReturn($info);
             }
-            //单日是否超出10W限制
+            //单日是否超出50W限制
             $res = $this->maxwithdeawOneday(floatval(I('post.money')));
             if ($res == false) {
                 $info['status'] = 3;
@@ -915,10 +895,8 @@ class UserController extends HomeController
             }
             //应付手续费
             $data['withdraw_fee'] = floatval(I('post.money')) * $list['value'] * 0.01;
-            //转出金额
-            $data['all_money'] = $data['all_money']/2;
             //实际金额
-            $data['money'] = (floatval(I('post.money')) - $data['withdraw_fee'])/2;
+            $data['money'] = floatval(I('post.money')) - $data['withdraw_fee'];
             //加时间
             $data['add_time'] = time();
             //加订单号

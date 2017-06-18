@@ -1,0 +1,116 @@
+ <include file="App/Home/View/Public/header.html"/>
+ <style>
+ .pass_ybc{ min-height:400px !important;}
+ .my_add{ margin-bottom:0px !important;}
+ </style>
+<div id="main">
+  <div class="main_box">
+  <include file="App/Home/View/Public/left.html"/>
+<!-- content start -->
+<div class="raise right clearfix" style="width:940px; padding:20px; background:#fff;">
+<div class="ybc_list">
+        <div class="ybcoin">
+          <h2 class="left">托管huge mt4账户</h2>
+          <div class="clear"></div>
+        </div>
+      </div>
+
+<h2 class="choose_one"></h2>
+
+<form action="{:U('User/doHuge')}" method="post" id="drawform" jump-url="{:U('User/huge')}">
+<table class="my_add" border="0" cellpadding="0" cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="position:relative; padding-left:90px;">用户名
+        <input class="sum" name="username" id="money"  autocomplete="off" type="text">
+        </td>
+      <td>
+      <font style="color: red">请输入您在HUGE平台的用户名</font>
+      </td>
+
+
+    </tr>
+    <tr>
+      <td style=" padding-left:90px;">密码
+        <input class="sum" name="password" id="pwdtrade" autocomplete="off" type="password"></td>
+        <td><font style="color: red">请输入您在HUGE平台的主密码</font><input style=" float:right; margin-right:103px;" class="confirm"  value="确认提交" type="submit"></td>
+    </tr>
+  </tbody>
+</table>
+</form>
+<div class="ybc_list">
+        <div class="ybcoin">
+          <h2 class="left">审核结果</h2>
+          <div class="clear"></div>
+        </div>
+<p><if condition="$status === '2'">托管已审核<br>
+您可以通过只读密码登陆HUGE MT4平台进行实时查看，以了解账户的情况<br>
+我们的资管团队会为您的资金安全及稳定盈利负责，请您放心
+<elseif condition="$status === '1'" />等待审核。。。<elseif condition="$status === '0'" />审核未通过<else />尚未托管</if></p>
+      </div>
+</div>
+<!-- content end -->
+  </div>
+  <div class="clear"></div>
+</div>
+<script type="text/javascript">
+function ajax_submit_form1(form){
+  var index='';
+    $.ajax({
+       type:$(form).attr("method"),
+       url: $(form).attr("action"),
+       async:false,
+       data: $(form).serialize(),
+       beforeSend: function(){
+         index= layer.msg('正在提交请稍后');
+         },
+       success: function(msg){
+         layer.msg(msg.info);
+       if(msg.status==1){
+         var url=$(form).attr("jump-url");
+         if(url){
+          window.location.href=url;
+         }else{
+          window.location.reload();
+           }
+         }else{
+            layer.msg(msg.info);
+            layer.close(index);
+            //window.location.reload();
+           }
+       }
+    });
+    return false;
+}
+  $(".menu21").addClass("uc-current");
+  $("#drawform").validate({
+        rules: {
+          money:{
+            required: true,
+            //min: 100,
+            //max: 50000,
+            },
+          pwdtrade:"required",
+          //code:"required",
+        },
+        messages: {
+          money:{
+            required: "请填写用户名",
+            //min: "提现金额最小100",
+            //max: "提现金额最大50000",
+            },
+
+          pwdtrade:"请填写密码",
+          //code:"请填写验证码",
+        },
+        submitHandler:function(form){
+          ajax_submit_form1(form)
+          return false;
+        },
+        invalidHandler: function() {  //不通过回调
+          return false;
+        }
+      });
+</script>
+<!--footer start-->
+<include file="App/Home/View/Public/footer.html"/>

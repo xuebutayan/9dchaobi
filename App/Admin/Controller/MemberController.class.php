@@ -410,6 +410,21 @@ class MemberController extends AdminController {
     	}
     	$this->ajaxReturn($data);
     }
+    function huge(){
+        $list = M('hugemt4 h')->field('h.*,m.user_name')->join(C("DB_PREFIX")."member as m on m.member_id=h.member_id",'LEFT')->order('h.add_time desc')->select();
+        $this->assign('list',$list);
+        $this->display();
+    }
+    function hugeId(){
+        $id = intval(I('post.id'));
+        if(empty($id)) $this->ajaxReturn(['status'=>0,'info'=>'参数错误！']);
+        if($_POST['no']==1)
+            M('hugemt4')->where(['id'=>$id])->setField('status',0);
+        else
+            M('hugemt4')->where(['id'=>$id])->setField('status',2);
+        $this->ajaxReturn(['status'=>1,'info'=>'操作成功！']);
+
+    }
 
 
 }

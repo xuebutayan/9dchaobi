@@ -225,9 +225,6 @@ class TradeController extends TradeFatherController
         }
         //减可用钱 加冻结钱
         M()->startTrans();
-        //50%交易额进入alps_mt4
-        $sellnum = $sellnum/2;
-        $r[] = $this->alps_mt4($this->member['member_id'],$sellnum,$currency['currency_id']);
         $r[] = $this->setUserMoney($this->member['member_id'], $currency['currency_id'], $sellnum, 'dec', 'num');
         $r[] = $this->setUserMoney($this->member['member_id'], $currency['currency_id'], $sellnum, 'inc', 'forzen_num');
         //写入数据库
@@ -243,15 +240,10 @@ class TradeController extends TradeFatherController
         } else {
             M()->commit();
             $msg['status'] = 1;
-            $msg['info']   = '委托数量 '.$sellnum.' 成功';
+            $msg['info']   = '操作成功';
             $this->ajaxReturn($msg);
         }
 
-    }
-    function alps_mt4($member_id,$num,$currency_id){
-        $re = M('member')->where(['member_id'=>$member_id])->setInc('alps_mt4',$num);//储备增加
-        $re1 = M('Currency_user')->where("member_id=$member_id and currency_id=$currency_id")->setDec('num',$num);
-        return $re&&$re1;
     }
 
     //我的成交

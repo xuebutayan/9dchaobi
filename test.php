@@ -1,2 +1,4 @@
 <?php
-echo date('Y-m-d H:i:s',1496997388);
+echo base64_encode('test1236666');
+echo '<br/>';
+echo strlen(base64_encode('test123'));
