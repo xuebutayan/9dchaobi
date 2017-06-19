@@ -600,6 +600,77 @@ class UserController extends HomeController
         $this->assign('art', $art);
         $this->display();
     }
+    //人民币转到代理中心
+    function daili(){
+        //dump($this->auth);
+        $this->assign('num',$this->auth['rmb']);
+        //获取交易日志
+        $list = M('finance')->where(['member_id'=>$_SESSION['USER_KEY_ID'],'type'=>24])->limit(10)->order('finance_id desc')->select();
+        $this->assign('list',$list);
+        $this->display();
+    }
+    function doDaili(){
+        $member_id = $_SESSION['USER_KEY_ID'];
+        $post = I('post.');
+        $data['amount'] = intval($post['money']);
+        //获取交易密码
+        $uinfo = M('member')->field('pwdtrade,user_id,login,alps_code')->where(['member_id'=>$member_id])->find();
+        //是否是代理中心会员
+        if (empty($uinfo['user_id'])) {
+            $info['status'] = 0;
+            $info['info']   = "您不是代理中心会员！";
+            $this->ajaxReturn($info);
+        }
+        //验证密码
+        if (md5($post['pwdtrade']) != $uinfo['pwdtrade']) {
+            $info['status'] = 0;
+            $info['info']   = "交易密码不正确";
+            $this->ajaxReturn($info);
+        }
+        if ($data['amount'] > $this->auth['rmb']) {
+            $info['status'] = 0;
+            $info['info']   = "交易数量大于账户余额";
+            $this->ajaxReturn($info);
+        }
+        $url = C('daili_url').'/api/market_money';
+        $req = ['uid'=>$uinfo['user_id'],'money'=>$data['amount']];
+        $re = curlPost($url,$req);
+        $return = json_decode($re,true);
+        //$return = ['status'=>1];
+        if($return['status']==1){
+            M('member')->where(['member_id'=>$member_id])->setDec('rmb',$data['amount']);
+            //插入财务日志
+            $this->addFinance($member_id,24,'转入代理中心'.$data['amount'],$data['amount'],2,0);
+            $info['status'] = 1;
+            $info['info']   = "操作成功！";
+            $this->ajaxReturn($info);
+        }else{
+            $info['status'] = 0;
+            $info['info']   = "操作失败！";
+            $this->ajaxReturn($info);
+        }
+    }
+    function huge(){
+        $huge = M('hugemt4');
+        $status = $huge->where("member_id ={$_SESSION['USER_KEY_ID']}")->getField('status');
+        $this->assign('status',$status);
+        $this->display();
+    }
+    function doHuge(){
+        $huge = M('hugemt4');
+        $post = I('post.');
+        if(empty($post['username'])|| empty($post['password'])) $this->ajaxReturn(['status'=>0,'info'=>'用户名或密码为空！']);
+        $status = $huge->where("member_id ={$_SESSION['USER_KEY_ID']}")->find();
+        if($status) $this->ajaxReturn(['status'=>0,'info'=>'请勿重复操作！']);
+        $data = [
+        'member_id'=>$_SESSION['USER_KEY_ID'],
+        'huge_user'=>$post['username'],
+        'huge_pwd'=>base64_encode($post['password']),
+        'add_time'=>time()
+        ];
+        M('hugemt4')->add($data);
+        $this->ajaxReturn(['status'=>1,'info'=>'提交成功！']);
+    }
     /**
      * 积分兑换人民币
      * @return [type] [description]
@@ -837,6 +908,15 @@ class UserController extends HomeController
         $mem_data = $member->field('pwdtrade,rmb,forzen_rmb')->where($where)->find();
         //交易密码
         if (IS_POST) {
+            //一天只允许提现一次
+            $start_time = strtotime(date('Y-m-d',time()));
+            $end_time = $start_time+86400;
+            $re = $withdraw->where(['uid'=>session('USER_KEY_ID'),'add_time'=>['between',$start_time.','.$end_time]])->find();
+            if($re){
+                $info['status'] = 0;
+                $info['info']   = "每天只允许提现一次";
+                $this->ajaxReturn($info);
+            }
             $data['bank_id']   = I('post.select_bank');
             $data['all_money'] = floatval(I('post.money')); //提现金额
             $data['pwdtrade']  = md5(I('post.pwdtrade'));
@@ -851,7 +931,7 @@ class UserController extends HomeController
                 $this->ajaxReturn($info);
             }
             //单笔在100至50000在之间
-            if ($data['all_money'] < 10 || $data['all_money'] > 500000) {
+            if ($data['all_money'] < 100 || $data['all_money'] > 50000) {
                 $info['status'] = 2;
                 $info['info']   = "提现金额超出限制";
                 $this->ajaxReturn($info);

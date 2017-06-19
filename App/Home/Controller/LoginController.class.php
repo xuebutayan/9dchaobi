@@ -45,11 +45,6 @@ class LoginController extends CommonController{
             }
             //判断传值是手机还是email
             $info = checkEmail($email)?$M_member->logCheckEmail($email):$M_member->logCheckMo($email);
-            if($info['status']==2){
-                $data['status']=2;
-                $data['info']="非常抱歉您的账号已被禁用";
-                $this->ajaxReturn($data);
-            }
             //验证手机或邮箱
             if($info==false){
                 $data['status']=2;
@@ -62,6 +57,11 @@ class LoginController extends CommonController{
             //$this->error('密码输入错误');
             $data['status']=2;
             $data['info']="密码输入错误";
+            $this->ajaxReturn($data);
+        }
+        if($info['status']==2){
+            $data['status']=2;
+            $data['info']="非常抱歉您的账号已被禁用";
             $this->ajaxReturn($data);
         }
         //获取下方能用到的参数
