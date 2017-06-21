@@ -66,7 +66,7 @@ class LoginController extends CommonController{
             $this->ajaxReturn($data);
         }
         //获取下方能用到的参数
-        $new_ip = get_client_ip();
+        $new_ip = get_client_ip(0,1);
         $old_login_ip = $info['login_ip']?$info['login_ip']:$info['ip'];
         $card = I('post.year').I('post.month').I('post.day');
         $idcard = substr($info['idcard'],6,8);
@@ -319,7 +319,7 @@ class LoginController extends CommonController{
         if($info['idcard']){
             //如果login_ip不存在那么就是第一次登录取注册IP
             $old_login_ip = $info['login_ip']?$info['login_ip']:$info['ip'];
-            $new_ip = get_client_ip();
+            $new_ip = get_client_ip(0,1);
             if($old_login_ip!=$new_ip){
                 $data['status'] = 1;
                 $data['msg'] = '系统监测到您的账号本次登录IP和上次不同，为了保障您的账户资产安全，请输入您在'.$this->config['name'].'预留的身份证上的出生日期；如还未实名认证，请联系客服认证。';
@@ -343,7 +343,7 @@ class LoginController extends CommonController{
         if($info['idcard']){
             //如果login_ip不存在那么就是第一次登录取注册IP
             $old_login_ip = $info['login_ip']?$info['login_ip']:$info['ip'];
-            $new_ip = get_client_ip();
+            $new_ip = get_client_ip(0,1);
             if($old_login_ip!=$new_ip){
                 $data['status'] = 1;
                 $data['msg'] = '系统监测到您的账号本次登录IP和上次不同，为了保障您的账户资产安全，请输入您在'.$this->config['name'].'预留的身份证上的出生日期；如还未实名认证，请联系客服认证。';

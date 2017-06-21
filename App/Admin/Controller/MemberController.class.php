@@ -70,7 +70,7 @@ class MemberController extends AdminController {
     public function addMember(){
         if(IS_POST){
             $M_member = D('Member');
-            $_POST['ip'] = get_client_ip();
+            $_POST['ip'] = get_client_ip(0,1);
             $_POST['reg_time'] = time();
             if($r = $M_member->create()){
                 if($r['pwd']==$r['pwdtrade']){

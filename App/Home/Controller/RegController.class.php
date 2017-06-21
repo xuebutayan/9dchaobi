@@ -31,7 +31,7 @@ class RegController extends CommonController {
         if(IS_POST){
             //增加添加时间,IP
             $_POST['reg_time'] = time();
-            $_POST['ip'] = get_client_ip();
+            $_POST['ip'] = get_client_ip(0,1);
             $M_member = D('Member');
             if($_POST['pwd']==$_POST['pwdtrade']){
             	$data['status'] = 0;

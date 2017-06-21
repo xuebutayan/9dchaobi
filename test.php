@@ -1,2 +1,3 @@
 <?php
-echo date('Y-m-d H:i:s',1496997388);
+//phpinfo();
+var_dump(getenv("HTTP_X_FORWARDED_FOR"));

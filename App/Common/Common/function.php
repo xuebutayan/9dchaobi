@@ -506,7 +506,7 @@ function addFinanceLog($member_id, $type, $content, $money, $money_type, $curren
     $data['money']       = $money; //变动资金数量
     $data['add_time']    = time(); //添加时间
     $data['currency_id'] = $currency_id; //币种
-    $data['ip']          = get_client_ip(); //ip
+    $data['ip']          = get_client_ip(0,1); //ip
     $data['status']      = 0;
     $r                   = $finance->data($data)->add();
     if ($r) {
