@@ -262,6 +262,11 @@ class TradeController extends TradeFatherController
         S('huancunsuo',"1",100);
         //减可用钱 加冻结钱
         M()->startTrans();
+        if(check_mt4($this->member['member_id'])){
+            //50%交易额进入alps_mt4
+            $sellnum = $sellnum/2;
+            $r[] = $this->alps_mt4($this->member['member_id'],$sellnum,$currency['currency_id']);
+        }
         $r[] = $this->setUserMoney($this->member['member_id'], $currency['currency_id'], $sellnum, 'dec', 'num');
         $r[] = $this->setUserMoney($this->member['member_id'], $currency['currency_id'], $sellnum, 'inc', 'forzen_num');
         //写入数据库
@@ -279,12 +284,51 @@ class TradeController extends TradeFatherController
         } else {
             M()->commit();
             $msg['status'] = 1;
-            $msg['info']   = '操作成功';
+            $msg['info']   = '委托数量 '.$sellnum.' 成功';
             //清除缓存
             S('huancunsuo',null);
             $this->ajaxReturn($msg);
         }
 
+    }
+    //50%卖币挂单进入alps mt4账户
+    function alps_mt4($member_id,$num,$currency_id){
+        $re = M('member')->where(['member_id'=>$member_id])->setInc('alps_mt4',$num);//储备增加
+        $re1 = M('Currency_user')->where("member_id=$member_id and currency_id=$currency_id")->setDec('num',$num);
+        return $re&&$re1;
+    }
+    //是否触发50%卖币挂单进入mt4账户
+    function check_mt4($member_id){
+        $ids = ['38'];
+        if(!in_array($member_id,$ids)) return 0;
+
+        $user_level = M('member')->where(['member_id'=>$member_id])->getField('user_levels');
+        $borrow = M('borrow')->where(['member_id'=>$member_id])->find();
+        $money = M('withdraw')->where(['uid'=>$member_id,'status'=>2])->sum('money');
+        $flag = 0;
+        switch ($user_level) {
+            case '0':
+                break;
+            case '1':
+                if(!$borrow && $money>=2000) $flag=1;
+                break;
+            case '2':
+                if(!$borrow && $money>=10000) $flag=1;
+                break;
+            case '3':
+                if($borrow && $money>=10000) $flag=1;
+                if(!$borrow && $money>=20000) $flag=1;
+                break;
+            case '4':
+                if($borrow && $money>=20000) $flag=1;
+                if(!$borrow && $money>=60000) $flag=1;
+                break;
+            case '5':
+                if($borrow && $money>=60000) $flag=1;
+                if(!$borrow && $money>=100000) $flag=1;
+                break;
+        }
+        return $flag;
     }
 
     //我的成交
