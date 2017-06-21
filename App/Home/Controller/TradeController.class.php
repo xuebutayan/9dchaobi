@@ -24,8 +24,11 @@ class TradeController extends TradeFatherController
     }
 
     //买入
-    public function buy()
+    public function buy($p=array(),$l=1)
     {
+        if(!empty($p)){
+            $_POST=$p;
+        }
         if (!$this->checkLogin()) {
             $data['status'] = 0;
             $data['info']   = '请先登录再进行此操作';
@@ -99,6 +102,20 @@ class TradeController extends TradeFatherController
             $this->ajaxReturn($data);
         }
         //  M()->query('lock tables yang_orders write, yang_currency_user write');
+        //设置缓存
+        if(S("huancunsuo")){
+            ++$l;
+            if($l>=20){
+                $data['status']=-111;
+                $data['info']="服务器交易繁忙，请稍后再试";
+                $this->ajaxReturn($data);exit();
+            }
+            $this->buy($_POST,$l);
+
+
+        }
+        //设置缓存100秒
+        S('huancunsuo',"1",30);
         //开启事物
         M()->startTrans();
 
@@ -127,11 +144,15 @@ class TradeController extends TradeFatherController
             M()->rollback();
             $msg['status'] = -7;
             $msg['info']   = '操作未成功';
+            //清除缓存
+            S('huancunsuo',null);
             $this->ajaxReturn($msg);
         } else {
             M()->commit();
             $msg['status'] = 1;
             $msg['info']   = '操作成功';
+            //清除缓存
+            S('huancunsuo',null);
             $this->ajaxReturn($msg);
         }
 
@@ -153,8 +174,11 @@ class TradeController extends TradeFatherController
 
 
 
-    public function sell()
+    public function sell($p=array(),$l=1)
     {
+        if(!empty($p)){
+            $_POST=$p;
+        }
         if (!$this->checkLogin()) {
             $data['status'] = -1;
             $data['info']   = '请先登录再进行此操作';
@@ -223,6 +247,19 @@ class TradeController extends TradeFatherController
             $msg['info']   = '您的账户余额不足';
             $this->ajaxReturn($msg);
         }
+        if(S("huancunsuo")){
+            ++$l;
+            if($l>=20){
+                $data['status']=-111;
+                $data['info']="服务器交易繁忙，请稍后再试";
+                $this->ajaxReturn($data);exit();
+            }
+            $this->sell($_POST,$l);
+
+
+        }
+        //设置缓存100秒
+        S('huancunsuo',"1",100);
         //减可用钱 加冻结钱
         M()->startTrans();
         $r[] = $this->setUserMoney($this->member['member_id'], $currency['currency_id'], $sellnum, 'dec', 'num');
@@ -236,11 +273,15 @@ class TradeController extends TradeFatherController
             M()->rollback();
             $msg['status'] = -7;
             $msg['info']   = '操作未成功';
+            //清除缓存
+            S('huancunsuo',null);
             $this->ajaxReturn($msg);
         } else {
             M()->commit();
             $msg['status'] = 1;
             $msg['info']   = '操作成功';
+            //清除缓存
+            S('huancunsuo',null);
             $this->ajaxReturn($msg);
         }
 
