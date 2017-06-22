@@ -316,8 +316,10 @@ function zfb(){
 				var m ;
 
 					m = $("#money").val()-$("#money").val()*fee*0.01;
+          $.post('{:U('User/check_mt4')}',{money:m,q:1},function(d){
+            $("#true_daozhang").val(m-d.m);
+          },'json')
 
-				$("#true_daozhang").val(m);
 			}
 			</script>
 

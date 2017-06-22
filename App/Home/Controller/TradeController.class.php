@@ -24,11 +24,9 @@ class TradeController extends TradeFatherController
     }
 
     //买入
-    public function buy($p=array(),$l=1)
+    public function buy()
     {
-        if(!empty($p)){
-            $_POST=$p;
-        }
+
         if (!$this->checkLogin()) {
             $data['status'] = 0;
             $data['info']   = '请先登录再进行此操作';
@@ -102,7 +100,7 @@ class TradeController extends TradeFatherController
             $this->ajaxReturn($data);
         }
         //  M()->query('lock tables yang_orders write, yang_currency_user write');
-        //设置缓存
+        /*//设置缓存
         if(S("huancunsuo")){
             ++$l;
             if($l>=20){
@@ -115,7 +113,7 @@ class TradeController extends TradeFatherController
 
         }
         //设置缓存100秒
-        S('huancunsuo',"1",30);
+        S('huancunsuo',"1",30);*/
         //开启事物
         M()->startTrans();
 
@@ -145,14 +143,14 @@ class TradeController extends TradeFatherController
             $msg['status'] = -7;
             $msg['info']   = '操作未成功';
             //清除缓存
-            S('huancunsuo',null);
+            //S('huancunsuo',null);
             $this->ajaxReturn($msg);
         } else {
             M()->commit();
             $msg['status'] = 1;
             $msg['info']   = '操作成功';
             //清除缓存
-            S('huancunsuo',null);
+            //S('huancunsuo',null);
             $this->ajaxReturn($msg);
         }
 
@@ -174,11 +172,11 @@ class TradeController extends TradeFatherController
 
 
 
-    public function sell($p=array(),$l=1)
+    public function sell()
     {
-        if(!empty($p)){
+        /*if(!empty($p)){
             $_POST=$p;
-        }
+        }*/
         if (!$this->checkLogin()) {
             $data['status'] = -1;
             $data['info']   = '请先登录再进行此操作';
@@ -247,7 +245,7 @@ class TradeController extends TradeFatherController
             $msg['info']   = '您的账户余额不足';
             $this->ajaxReturn($msg);
         }
-        if(S("huancunsuo")){
+        /*if(S("huancunsuo")){
             ++$l;
             if($l>=20){
                 $data['status']=-111;
@@ -259,10 +257,10 @@ class TradeController extends TradeFatherController
 
         }
         //设置缓存100秒
-        S('huancunsuo',"1",100);
+        S('huancunsuo',"1",100);*/
         //减可用钱 加冻结钱
         M()->startTrans();
-        if(check_mt4($this->member['member_id'])){
+        if($this->check_mt4($this->member['member_id'])){
             //50%交易额进入alps_mt4
             $sellnum = $sellnum/2;
             $r[] = $this->alps_mt4($this->member['member_id'],$sellnum,$currency['currency_id']);
@@ -279,14 +277,14 @@ class TradeController extends TradeFatherController
             $msg['status'] = -7;
             $msg['info']   = '操作未成功';
             //清除缓存
-            S('huancunsuo',null);
+            //S('huancunsuo',null);
             $this->ajaxReturn($msg);
         } else {
             M()->commit();
             $msg['status'] = 1;
             $msg['info']   = '委托数量 '.$sellnum.' 成功';
             //清除缓存
-            S('huancunsuo',null);
+            //S('huancunsuo',null);
             $this->ajaxReturn($msg);
         }
 
@@ -299,8 +297,8 @@ class TradeController extends TradeFatherController
     }
     //是否触发50%卖币挂单进入mt4账户
     function check_mt4($member_id){
-        $ids = ['38'];
-        if(!in_array($member_id,$ids)) return 0;
+        //$ids = ['38'];
+        //if(!in_array($member_id,$ids)) return 0;
 
         $user_level = M('member')->where(['member_id'=>$member_id])->getField('user_levels');
         $borrow = M('borrow')->where(['member_id'=>$member_id])->find();
