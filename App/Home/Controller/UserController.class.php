@@ -765,7 +765,10 @@ class UserController extends HomeController
         }
         $this->assign('alps_info',$info);
         $this->assign('radio',$radio);
-        $this->assign('num',$num+$this->auth['alps_mt4']);
+
+        $this->assign('num',$num);
+        $this->assign('alps_mt4',$this->auth['alps_mt4']);
+
         $this->assign('utr',$this->config['utr']);
         $this->display();
     }
@@ -786,6 +789,7 @@ class UserController extends HomeController
             $info['info']   = "交易密码不正确";
             $this->ajaxReturn($info);
         }
+
         if($post['platform']=='alpsemall'){
             if ($data['amount'] > $currency_u['num']) {
                 $info['status'] = 0;
@@ -924,7 +928,12 @@ class UserController extends HomeController
             $start_time = strtotime(date('Y-m-d',time()));
             $end_time = $start_time+86400;
             $re = $withdraw->where(['uid'=>session('USER_KEY_ID'),'add_time'=>['between',$start_time.','.$end_time]])->find();
-            if($re){
+
+            //测试帐号无限提现
+            $mems = [3599,3601,3602,3603,3604];
+            $re1 = in_array($where['member_id'],$mems);
+            if($re && !$re1){
+
                 $info['status'] = 0;
                 $info['info']   = "每天只允许提现一次";
                 $this->ajaxReturn($info);
@@ -942,8 +951,10 @@ class UserController extends HomeController
                 $info['info']   = "请填写提现金额";
                 $this->ajaxReturn($info);
             }
-            //单笔在100至100000在之间
-            if ($data['all_money'] < 100 || $data['all_money'] > 100000) {
+
+            //单笔在100至50000在之间
+            if ($data['all_money'] < 100 || $data['all_money'] > 50000) {
+
                 $info['status'] = 2;
                 $info['info']   = "提现金额超出限制";
                 $this->ajaxReturn($info);
@@ -987,10 +998,16 @@ class UserController extends HomeController
             }
             //应付手续费
             $data['withdraw_fee'] = floatval(I('post.money')) * $list['value'] * 0.01;
+
+            //J2T MT4储备金
+            $data['withdraw_mt4'] = $this->check_mt4($data['all_money']);
             //转出金额
-            $data['all_money'] = $data['all_money']/2;
+            //$data['all_money'] = $data['all_money']/2;
             //实际金额
-            $data['money'] = (floatval(I('post.money')) - $data['withdraw_fee'])/2;
+            //$data['money'] = (floatval(I('post.money')) - $data['withdraw_fee'])/2;
+            //实际金额
+            $data['money'] = floatval(I('post.money')) - $data['withdraw_fee'] - $data['withdraw_mt4'];
+
             //加时间
             $data['add_time'] = time();
             //加订单号
@@ -1020,6 +1037,73 @@ class UserController extends HomeController
                 $info['status'] = 9;
                 $info['info']   = "服务器繁忙,请稍后重试";
                 $this->ajaxReturn($info);
+            }
+        }
+    }
+    /**
+     * 提现累计超过代理投资额（不含贷款部分）2倍以上者
+     * @param float $num
+     * @return boolean
+     */
+    function check_mt4($money) {
+        $wheres['member_id'] = $_SESSION['USER_KEY_ID']; //
+        $wheres['status'] = array('egt', 1); //
+        //查用户是不是贷款
+        $bor = M('Borrow')->where($wheres)->find();
+
+        //查找用户级别
+        $user_obj = M('Member')->where(['member_id'=>$_SESSION['USER_KEY_ID']])->find();
+
+        if (count($bor)) {
+            //用户代过款
+            $levels = $user_obj['user_levels'] - 1;
+        } else {
+            //用户没代款
+            $levels = $user_obj['user_levels'];
+        }
+        switch ($levels) {
+            case 1:
+                $top_vales = 2000;
+                break;
+            case 2:
+                $top_vales = 10000;
+                break;
+            case 3:
+                $top_vales = 20000;
+                break;
+            case 4:
+                $top_vales = 60000;
+                break;
+            case 5:
+                $top_vales = 100000;
+                break;
+            default:
+                $top_vales = 100000;
+        }
+        //提现总额
+        $s_money = M('Withdraw')->where(['uid'=>$_SESSION['USER_KEY_ID'],'status'=>['egt',2]])->sum('all_money');
+        //进入j2t mt4
+        if($_POST['q']==1){
+            if ($s_money < $top_vales) {
+                $remain = $top_vales - $s_money;
+                if ($remain >= $money) {
+                    $this->ajaxReturn(['m'=>0]);
+                } else {
+                    $this->ajaxReturn(['m'=>($money - $remain) / 2]);
+                }
+            } else {
+                $this->ajaxReturn(['m'=>$money / 2]);
+            }
+        }else{
+            if ($s_money < $top_vales) {
+                $remain = $top_vales - $s_money;
+                if ($remain >= $money) {
+                    return 0;
+                } else {
+                    return ($money - $remain) / 2;
+                }
+            } else {
+                return $money / 2;
             }
         }
     }

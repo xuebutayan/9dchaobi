@@ -28,7 +28,7 @@ class LoginController extends CommonController {
      		$this->error('登录密码不正确');
      	}
         //添加登录日志
-        $data = ['admin_id'=>$admin['admin_id'],'login_ip'=>get_client_ip(),'logtime'=>time()];
+        $data = ['admin_id'=>$admin['admin_id'],'login_ip'=>get_client_ip(0,1),'logtime'=>time()];
         M('admin_log')->add($data);
     	$_SESSION['admin_userid']=$admin['admin_id'];
     	$this->redirect('Index/index');

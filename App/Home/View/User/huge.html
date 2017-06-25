@@ -10,7 +10,7 @@
 <div class="raise right clearfix" style="width:940px; padding:20px; background:#fff;">
 <div class="ybc_list">
         <div class="ybcoin">
-          <h2 class="left">托管huge mt4账户</h2>
+          <h2 class="left">托管j2t mt4账户</h2>
           <div class="clear"></div>
         </div>
       </div>
@@ -20,12 +20,21 @@
 <form action="{:U('User/doHuge')}" method="post" id="drawform" jump-url="{:U('User/huge')}">
 <table class="my_add" border="0" cellpadding="0" cellspacing="0">
   <tbody>
+
+  <tr>
+     <td style="position:relative; padding-left:90px;">
+      J2T开户链接: https://j2t.cn/ref/hCx86kPyWB
+     </td>
+     <td>J2T官网: http://www.just2trade.cn/</td>
+  </tr>
     <tr>
       <td style="position:relative; padding-left:90px;">用户名
         <input class="sum" name="username" id="money"  autocomplete="off" type="text">
         </td>
       <td>
-      <font style="color: red">请输入您在HUGE平台的用户名</font>
+
+      <font style="color: red">请输入您在J2T平台的用户名</font>
+
       </td>
 
 
@@ -33,7 +42,8 @@
     <tr>
       <td style=" padding-left:90px;">密码
         <input class="sum" name="password" id="pwdtrade" autocomplete="off" type="password"></td>
-        <td><font style="color: red">请输入您在HUGE平台的主密码</font><input style=" float:right; margin-right:103px;" class="confirm"  value="确认提交" type="submit"></td>
+
+        <td><font style="color: red">请输入您在J2T平台的主密码</font><input style=" float:right; margin-right:103px;" class="confirm"  value="确认提交" type="submit"></td>
     </tr>
   </tbody>
 </table>
@@ -44,7 +54,9 @@
           <div class="clear"></div>
         </div>
 <p><if condition="$status === '2'">托管已审核<br>
-您可以通过只读密码登陆HUGE MT4平台进行实时查看，以了解账户的情况<br>
+
+您可以通过只读密码登陆J2T MT4平台进行实时查看，以了解账户的情况<br>
+
 我们的资管团队会为您的资金安全及稳定盈利负责，请您放心
 <elseif condition="$status === '1'" />等待审核。。。<elseif condition="$status === '0'" />审核未通过<else />尚未托管</if></p>
       </div>

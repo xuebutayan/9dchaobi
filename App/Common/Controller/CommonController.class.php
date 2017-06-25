@@ -331,7 +331,7 @@ class CommonController extends Controller {
     	$data['money']=$money;
     	$data['add_time']=time();
     	$data['currency_id']=$currency_id;
-        $data['ip'] = get_client_ip();
+        $data['ip'] = get_client_ip(0,1);
     	$list=M('Finance')->add($data);
     	if($list){
     		return $list;

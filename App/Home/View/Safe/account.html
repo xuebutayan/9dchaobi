@@ -7,7 +7,9 @@
   <div class="main_box">
   <include file="App/Home/View/Public/left.html"/>
 <!-- content start -->
+
 <div class="raise right clearfix" style="width:940px; padding:20px; background:#fff;">
+（当前alps可用{$num},alps mt4可用{$mt4_num})
 <div class="sc_info_list" id="sc_info_list">
 <dl style="background-color: rgb(249, 249, 249);">
     <dt>当前主从状态</dt>
@@ -226,7 +228,7 @@ $("#bangform").validate({
 </if>
 <else />
 
-<h2 class="choose_one">转币到主账户（当前可用{$num}）</h2>
+<h2 class="choose_one">转币到主账户（当前alps可用{$num},alps mt4可用{$mt4_num}）</h2>
 <form action="{:U('Safe/exportAlps')}" method="post" id="drawform" jump-url="{:U('Safe/account')}">
 <table class="my_add" border="0" cellpadding="0" cellspacing="0">
   <tbody>

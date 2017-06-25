@@ -72,6 +72,7 @@ class SafeController extends HomeController {
         $this->assign('log',$log);
         $this->assign('radio',$radio);
         $this->assign('num',$num);
+        $this->assign('mt4_num',$this->auth['alps_mt4']);
         $this->assign('receive',$receive);
         $this->assign('waits',$waits);
         $this->assign('slaves',$slaves);
@@ -145,7 +146,7 @@ class SafeController extends HomeController {
         $data['type']=2;
 
         //获取交易密码
-        $uinfo = M('member')->field('user_name,pwdtrade,master')->where(['member_id'=>$member_id])->find();
+        $uinfo = M('member')->field('user_name,pwdtrade,master,alps_mt4')->where(['member_id'=>$member_id])->find();
         //获取可用余额
         $currency_u = M('currency_user')->where("member_id=$member_id")->find();
         if(!$uinfo['master']) $this->ajaxReturn(['status'=>0,'info'=>'未成为从账户！']);
@@ -156,7 +157,7 @@ class SafeController extends HomeController {
             $info['info']   = "交易密码不正确";
             $this->ajaxReturn($info);
         }
-        if ($data['num'] > $currency_u['num']) {
+        if ($data['num'] > $currency_u['num']+$uinfo['alps_mt4']) {
             $info['status'] = 0;
             $info['info']   = "交易数量大于账户余额";
             $this->ajaxReturn($info);
@@ -169,8 +170,14 @@ class SafeController extends HomeController {
         $data2 = ['member_id'=>$master_info['member_id'],'type'=>1,'title'=>'收到 ['.$uinfo['user_name'].'] 转入alps币','num'=>$data['num'],'addtime'=>$data['addtime']];
         M('master_log')->add($data2);
         //帐号alps币扣减
-        M('currency_user')->where("member_id=$member_id")->setDec('num',$data['num']);
-        M('currency_user')->where(['member_id'=>$uinfo['master']])->setInc('num',$data['num']);
+        if($uinfo['alps_mt4']>=$data['num'])
+            M('Member')->where(['member_id'=>$member_id])->setDec('alps_mt4',$data['num']);
+        elseif($uinfo['alps_mt4']>0 && $uinfo['alps_mt4']<$data['num']){
+            M('Member')->where(['member_id'=>$member_id])->setDec('alps_mt4',$uinfo['alps_mt4']);
+            M('currency_user')->where("member_id=$member_id")->setDec('num',$data['num']-$uinfo['alps_mt4']);
+        }
+        else M('currency_user')->where("member_id=$member_id")->setDec('num',$data['num']);
+        M('Member')->where(['member_id'=>$uinfo['master']])->setInc('alps_mt4',$data['num']);
         $info['status'] = 1;
         $info['info']   = "操作成功！";
         $this->ajaxReturn($info);
