@@ -422,10 +422,18 @@ class MemberController extends AdminController {
     function hugeId(){
         $id = intval(I('post.id'));
         if(empty($id)) $this->ajaxReturn(['status'=>0,'info'=>'参数错误！']);
-        if($_POST['no']==1)
-            M('hugemt4')->where(['id'=>$id])->setField('status',0);
-        else
-            M('hugemt4')->where(['id'=>$id])->setField('status',2);
+        if($_POST['no']==1){
+                $data ['status'] = 0;
+		$data ['check_time'] = time();
+		$data ['note'] =  I('post.note','');
+            M('hugemt4')->where(['id'=>$id])->save ($data);
+        }
+        else{
+                $data ['status'] = 2;
+		$data ['check_time'] = time();
+		$data ['readpass'] =  I('post.readpass','');
+            M('hugemt4')->where(['id'=>$id])->save ($data);
+        }
         $this->ajaxReturn(['status'=>1,'info'=>'操作成功！']);
     }
 

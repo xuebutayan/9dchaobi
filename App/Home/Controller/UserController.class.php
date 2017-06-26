@@ -650,26 +650,90 @@ class UserController extends HomeController
             $this->ajaxReturn($info);
         }
     }
-    function huge(){
+   function huge() {
         $huge = M('hugemt4');
         $status = $huge->where("member_id ={$_SESSION['USER_KEY_ID']}")->getField('status');
-        $this->assign('status',$status);
+          //显示托管j2t mt4账户
+        $draw_info = $huge->where("member_id ={$_SESSION['USER_KEY_ID']}")->order("id asc")->select();
+        $this->assign('draw_info', $draw_info);
+        $this->assign('status', $status);
         $this->display();
     }
-    function doHuge(){
+
+    function doHuge() {
         $huge = M('hugemt4');
         $post = I('post.');
-        if(empty($post['username'])|| empty($post['password'])) $this->ajaxReturn(['status'=>0,'info'=>'用户名或密码为空！']);
-        $status = $huge->where("member_id ={$_SESSION['USER_KEY_ID']}")->find();
-        if($status) $this->ajaxReturn(['status'=>0,'info'=>'请勿重复操作！']);
-        $data = [
-        'member_id'=>$_SESSION['USER_KEY_ID'],
-        'huge_user'=>$post['username'],
-        'huge_pwd'=>base64_encode($post['password']),
-        'add_time'=>time()
-        ];
-        M('hugemt4')->add($data);
-        $this->ajaxReturn(['status'=>1,'info'=>'提交成功！']);
+        // $this->ajaxReturn(['status'=>1,'info'=>'提交成功！']);
+        // $this->ajaxReturn(['status'=>0,'info'=>$post]);
+        if (array_search("", $post['username'])) {
+            $this->ajaxReturn(['status' => 0, 'info' => '登录名不能为空！']);
+        }
+        if (array_search("", $post['password'])) {
+            $this->ajaxReturn(['status' => 0, 'info' => '密码不能为空！']);
+        }
+        if (count($post['username']) > count(array_unique($post['username']))) {
+            $this->ajaxReturn(['status' => 0, 'info' => '你填写的登录名有重复！']);
+        }
+        $map['huge_user'] = array('in', $post['username']);
+        $obj = $huge->where($map)->field("huge_user")->select();
+        foreach ($obj as $key => $value) {
+            $m[$key] = $value['huge_user'];
+        }
+        if (count($obj)) {
+            $c = implode(", ", $m);
+            $this->ajaxReturn(['status' => 0, 'info' => '服务器已有登录名 ' . $c . ', 请换别的帐号']);
+        }
+
+        $obj_count = $huge->where("member_id ={$_SESSION['USER_KEY_ID']}")->count();
+        if($obj_count<1){
+            if(count($post['username'])<2){
+                 $this->ajaxReturn(['status' => 0, 'info' => 'MT4账户首次最少必须添加2个账户 ']);
+            }       
+        }
+        if ((100 - $obj_count) < count($post['username'])) {
+            $countss = 100 - $obj_count;
+            $this->ajaxReturn(['status' => 0, 'info' => '最多只能添加100个帐户 你还可以添加' . $countss . '个帐号']);
+        }
+        foreach ($post['username'] as $k => $value) {
+            $data = [
+                'member_id' => $_SESSION['USER_KEY_ID'],
+                'huge_user' => $value,
+                'huge_pwd' => base64_encode($post['password'][$k]),
+                'add_time' => time()
+            ];
+            M('hugemt4')->add($data);
+            unset($value);
+            unset($data);
+        }
+        $this->ajaxReturn(['status' => 1, 'info' => '提交成功！']);
+    }
+public function chexiaoHugeByid() {
+     $huge = M('hugemt4');
+        $id = I("post.id");
+        if (empty($id)) {
+            $data['status'] = 0;
+            $data['info'] = "参数错误";
+            $this->ajaxReturn($data);
+        }
+        //查询出对应id的提现金额,对应会员的会员id
+        $obj_info = $huge->field('status')->where("id = {$id}")->find();
+       
+        //查状态是否在可操作的状态
+        if ($obj_info['status'] == 2) {
+            $data['status'] = 5;
+            $data['info'] = "审核已通过请勿操作";
+            $this->ajaxReturn($data);
+        }
+
+        $res = $huge->where("id = {$id}")->delete();
+        if (!$res) {
+            $data['status'] = 3;
+            $data['info'] = "撤销失败";
+            $this->ajaxReturn($data);
+        }
+        $data['status'] = 1;
+        $data['info'] = "撤销成功";
+        $this->ajaxReturn($data);
     }
     /**
      * 积分兑换人民币

@@ -17,6 +17,7 @@
                             <th>会员ID</th>
                             <th>j2t用户名</th>
                             <th>j2t密码</th>
+                            <th>j2t只读密码</th>
                             <th>提交时间</th>
                             <th>状态</th>
                             <th>操作</th>
@@ -28,6 +29,7 @@
                             <td>{$vo.member_id}</td>
                             <td>{$vo.huge_user}</td>
                             <td>{$vo.huge_pwd|base64_decode}</td>
+                            <td>{$vo.readpass|default="-"}</td>
                             <td>{$vo.add_time|date='Y-m-d H:i:s',###}</td>
                             <td><eq name="vo.status" value="0">未通过<else/><eq name="vo.status" value="2">通过<else/>审核中</eq></eq></td>
                             <td>
@@ -54,11 +56,9 @@
 $(".sub-menu").eq(3).show();
 $(".sub-menu").eq(3).children("li").eq(5).addClass("on");
 function pass(id){
-	layer.confirm('确定通过审核', {
-	  btn: ['确定','取消'], //按钮
-	}, function(){
+	layer.prompt({title: '给用户留下只读密码', formType: 2}, function(text, index){
 		//location.href = '{:U('Pending/successByid',array('id'=>$vo['withdraw_id']))}';
-		$.post("{:U('Member/hugeId')}",{"id":id},function(datas){
+		$.post("{:U('Member/hugeId')}",{"id":id,"readpass":text},function(datas){
 				if(datas.status == 0){
 					layer.msg(datas['info']);
 					setTimeout("location.reload()",2000);
@@ -74,11 +74,9 @@ function pass(id){
 }
 layer.config({extend:'extend/layer.ext.js'});
 function fail(id){
-    layer.confirm('确定不通过审核', {
-      btn: ['确定','取消'], //按钮
-    }, function(){
+    layer.prompt({title: '选择性添加审核不通过备注信息', formType: 2}, function(text, index){
         //location.href = '{:U('Pending/successByid',array('id'=>$vo['withdraw_id']))}';
-        $.post("{:U('Member/hugeId')}",{"id":id,"no":1},function(datas){
+        $.post("{:U('Member/hugeId')}",{"id":id,"no":1,"note":text},function(datas){
                 if(datas.status == 0){
                     layer.msg(datas['info']);
                     setTimeout("location.reload()",2000);
