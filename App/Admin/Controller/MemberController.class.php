@@ -42,6 +42,10 @@ class MemberController extends AdminController {
             $where['mt4'] = ['neq',''];
             $new_where .= " m.mt4 <> '' ";
         }
+        if(I('j2t5000')){
+            $where['huge_mt4'] = ['egt',100];
+            $new_where .= " m.huge_mt4 >= 100 ";
+        }
 
         $count      =  M('Member')->where($where)->count();// 查询满足要求的总记录数
 

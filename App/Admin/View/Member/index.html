@@ -19,6 +19,7 @@
                             <td width="70">代理编号:</td>
                             <td><input class="common-text" placeholder="关键字" name="user_code" type="text"></td>
                             <td><input type="checkbox" name="mt4" value="1">存在mt4帐号</td>
+                            <td><input type="checkbox" name="j2t5000" value="1">j2t账户大于5000</td>
                             <td><input class="btn btn-primary btn2"  value="查询" type="submit"></td>
                         </tr>
                     </table>
@@ -43,7 +44,7 @@
 						<th>推荐人</th>
                         <th>会员姓名</th>
                         <th>手机号</th>
-                        <th>ALPS币</th>
+                        <th width="70">ALPS币</th>
                         <th>账户余额</th>
                         <th>账户积分</th>
                         <th>冻结金钱</th>
@@ -60,7 +61,10 @@
 							<td>{$vo['pid']}</td>
                             <td>{$vo['name']}</td>
                             <td>{$vo['phone']}</td>
-                            <td>{$vo.cnum|default=0}</td>
+                            <td>{$vo.cnum|default=0}<br>
+                            alps mt4:<br>{$vo.alps_mt4}<br>
+                            j2t mt4:<br>{$vo.huge_mt4}
+                            </td>
                             <td>{$vo['rmb']}</td>
                             <td>{$vo['integrals']}</td>
                             <td>{$vo['forzen_rmb']}</td>
