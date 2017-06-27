@@ -15,9 +15,13 @@
                             <th>ID</th>
                             <th>用户名</th>
                             <th>会员ID</th>
-                            <th>j2t用户名</th>
-                            <th>j2t密码</th>
-                            <th>j2t只读密码</th>
+                            <th>mt4用户名</th>
+                            <th>mt4密码</th>
+                            <th>mt4只读密码</th>
+                            <th>身份证姓名</th>
+                            <th>身份证号码</th>
+                            <th>签发机关</th>
+                            <th>有效期限</th>
                             <th>提交时间</th>
                             <th>状态</th>
                             <th>操作</th>
@@ -30,6 +34,10 @@
                             <td>{$vo.huge_user}</td>
                             <td>{$vo.huge_pwd|base64_decode}</td>
                             <td>{$vo.readpass|default="-"}</td>
+                            <td>{$vo.card_name|default="-"}</td>
+                            <td>{$vo.card_no|default="-"}</td>
+                            <td>{$vo.card_issue|default="-"}</td>
+                            <td>{$vo.card_term|default="-"}</td>
                             <td>{$vo.add_time|date='Y-m-d H:i:s',###}</td>
                             <td><eq name="vo.status" value="0">未通过<else/><eq name="vo.status" value="2">通过<else/>审核中</eq></eq></td>
                             <td>

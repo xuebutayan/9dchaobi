@@ -25,12 +25,12 @@
     } while ($('[name="password\[' + key + '\]"]').length > 0);
     var keymum = ($('#parameter>.field').length) + 1;
     var html = '<tr class="field">' +
-            '<td style="position:relative; padding-left:90px;">MT4 账户' + keymum + '  登录名' +
-            ' <input class="sum" name="username[' + keymum + ']" id="money"  autocomplete="off" type="text">' +
+            '<td style="position:relative; padding-left:20px;">MT4 账户' + keymum + '  登录名' +
+            ' <input class="sum" name="username[' + keymum + ']" id="username' + keymum + '"  autocomplete="off" type="text">' +
             '</td>' +
-            '<td>密码' +
-            '<input class="sum" name="password[' + keymum + ']" id="pwdtrade" autocomplete="off" type="text">' +
-            '<button type="button" class="parameter_del">删除</button></td>' +
+            '<td>密码 ' +
+            '<input class="sum" name="password[' + keymum + ']" id="password' + keymum + '" autocomplete="off" type="text">' +
+            '<button type="button" class="parameter_del" style="margin-left:10px;">删除</button></td>' +
             '</tr>';
     $('#parameter').append(html);
     });
@@ -48,18 +48,22 @@
                  </div>    
                </div>
                 <h2 style="padding-left: 20px;border-bottom: 2px solid #f60;color: #000;font-size: 16px;margin-top: 5px;margin-bottom: 10px;"></h2>
-               <p>
+               <p style="padding-left:20px; margin-bottom:15px; border-bottom:1px dashed #ccc; font-size:14px; padding-bottom:10px;">
+                J2T开户链接:<a style="margin-right:130px;" href="https://j2t.cn/ref/hCx86kPyWB" target="_Blank">https://j2t.cn/ref/hCx86kPyWB</a>
+                J2T官网:<a href="http://www.just2trade.cn/" target="_Blank">http://www.just2trade.cn/</a>
+               </p>
+               <p style="padding-left:20px;">
                    1.新会员点击<a href="https://j2t.cn/ref/hCx86kPyWB" target="_Blank"><font color="#FF0000"><strong>"J2T账户注册"</strong></font></a> 注册J2T新账户，注册好之后，用户名和密码会通过邮箱发送到您的手中，用户名一般为86+手机号码，例如8618886868686  该J2T账户和密码不需要提交，由您自己妥善保管；</p>
-               <p>2.首次<a href="https://j2t.cn" target="_Blank"><font color="#FF0000"><strong>"登陆J2T账号"</strong></font></a>后台后请设置密码，该密码用于"入金"和"出金"时使用，请牢记J2T账户密码；</p>
-                <p>3.MT4账号是登录"J2T账户"后台后可以查看到，一般为5位纯数字，例如：16766/16788 ；</p>
-                <p>4.进入"J2T账号"后，点击"我的账户"点击"设置"修改 MetaTrader 4 密码，该密码需要提交到"ALPS交易大盘"；</p>
-                <p>5.入金成功后，点击"我的账户"在杠杆栏设置杠杆比例为：1:500 （<font color="#FF0000"><strong>所有会员统一设置为1:500</strong></font>）</p>
-                <p>6.需要提交到ALPS交易大盘的是MT4的账号"登录名"和"密码"；</p>
+               <p style="padding-left:20px;">2.首次<a href="https://j2t.cn" target="_Blank"><font color="#FF0000"><strong>"登陆J2T账号"</strong></font></a>后台后请设置密码，该密码用于"入金"和"出金"时使用，请牢记J2T账户密码；</p>
+                <p style="padding-left:20px;">3.MT4账号是登录"J2T账户"后台后可以查看到，一般为5位纯数字，例如：16766/16788 ；</p>
+                <p style="padding-left:20px;">4.进入"J2T账号"后，点击"我的账户"点击"设置"修改 MetaTrader 4 密码，该密码需要提交到"ALPS交易大盘"；</p>
+                <p style="padding-left:20px;">5.入金成功后，点击"我的账户"在杠杆栏设置杠杆比例为：1:500 （<font color="#FF0000"><strong>所有会员统一设置为1:500</strong></font>）</p>
+                <p style="padding-left:20px;">6.需要提交到ALPS交易大盘的是MT4的账号"登录名"和"密码"；</p>
                 
                 
             <div class="ybc_list">
                 <div class="ybcoin">
-                    <h2 class="left">托管j2t mt4账户</h2>
+                    <h2 class="left">添加托管MT4账户</h2>
                     <div class="clear"></div>
                 </div>
             </div>
@@ -70,29 +74,55 @@
                 <table class="my_add" border="0" cellpadding="0" cellspacing="0">
                     <tbody  id="parameter">
 
-                        <tr>
+                        <!--<tr>
                             <td style="position:relative; padding-left:90px;">
                                 J2T开户链接: <a href="https://j2t.cn/ref/hCx86kPyWB" target="_Blank">https://j2t.cn/ref/hCx86kPyWB</a>
                             </td>
                             <td>J2T官网:<a href="http://www.just2trade.cn/" target="_Blank">http://www.just2trade.cn/</a></td>
-                        </tr>
+                        </tr>-->
                         <tr>
-                            <td colspan="2" style="position:relative; padding-left:90px;">
-请添加您的MT4“登录名”和“密码”，点击“确认提交”，系统审核通过后会给您发“只读密码”，您可以通过“只读密码”查看<br>自己账户的交易情况，托管MT4账户首次必须添加2个账户，如有更多账户可以点击“增加”添加多个账户“登录名”和“密码”。
+                            <td colspan="2" style="position:relative; padding-left:20px;">
+<!--请添加您的MT4“登录名”和“密码”，点击“确认提交”，系统审核通过后会给您发“只读密码”，您可以通过“只读密码”查看自己账户的交易情况，托管MT4账户首次必须添加2个账户，如有更多账户可以点击“增加”添加多个账户“登录名”和“密码”。-->
+   <p>“托管 MT4账户”需要您进行以下操作：</p>
+   <p>1、提交 MT4“登录名”和“密码”（修改该密码不影响您正常入金/出金）</p>
+   <p>2、提交本人“身份证姓名”、“身份证号码”、“签发机关”“有效期限”（仅用于填写<strong><a style="color:#F00" href="http://www.alpscoin.com/Uploads/Uploads/订阅号信息交易.doc" target="_Blank">“订阅信息交易”</a></strong>）</p>
+   <p>3、点击“确认提交”，系统审核通过后会给您发“只读密码”，您可以通过“只读密码”查看自己账户的交易情况</p>
+   <p>4、托管MT4账户首次必须添加2个账户，如有更多账户可以点击“增加”添加多个账户</p>
                             </td>
                         </tr>
                         <tr>
-                            <td style="position:relative; padding-left:90px;">
+                            <td style="position:relative; padding-left:20px;">
                                 <span class="field" style=" margin-bottom: 15px;"> <button type="button" class="parameter_add"> 增加 </button></span> 
                             </td>
                             <td>   <input style=" float:right; margin-right:103px;" class="confirm"  value="确认提交" type="submit">  </td>
                         </tr>
                         <tr class="field">
-                            <td style="position:relative; padding-left:90px;">MT4 账户1    登录名
-                                <input class="sum" name="username[1]" id="money"  autocomplete="off" type="text">
+                            <td style="position:relative; padding-left:20px; width:330px;">MT4 账户1    登录名
+                                <input class="sum" name="username[1]" id="username1"  autocomplete="off" type="text">
                             </td>
                             <td>密码
-                                <input class="sum" name="password[1]" id="pwdtrade" autocomplete="off" type="text">
+                                <input class="sum" name="password[1]" id="password2" autocomplete="off" type="text">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="my_add" border="0" cellpadding="0" cellspacing="0">
+                    <tbody>
+                        <tr class="field">
+                            <td style="position:relative; padding-left:20px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;身份证姓名
+                                <input class="sum" name="card_name" id="card_name"  autocomplete="off" type="text">
+                            </td>
+                            <td>身份证号码
+                                <input class="sum" name="card_no" id="card_no" autocomplete="off" type="text">
+                            </td>
+                        </tr>
+                        <tr class="field">
+                            <td style="position:relative; padding-left:20px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;签发机关
+                                <input class="sum" name="card_issue" id="card_issue"  autocomplete="off" type="text">
+                            </td>
+                            <td>&nbsp;&nbsp;&nbsp;有效期限
+                                <input class="sum" name="card_term" id="card_term" autocomplete="off" type="text">
+                                <font color="#666666">格式为：2017.01.01-2037.01.01</font>
                             </td>
                         </tr>
                     </tbody>
