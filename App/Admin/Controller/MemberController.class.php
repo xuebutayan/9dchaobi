@@ -513,16 +513,5 @@ class MemberController extends AdminController {
         $this->assign('page',$show);// 赋值分页输出
         $this->display();
     }
-    //导出excel
-    function expCaiwu(){
-        $xlsName = '用户财务统计';
-        $xlsCell = [
-            ['id','ID标识'],
-            ['user_name','用户名'],
-            ['user_levels','用户级别'],
-            ['send_times','积分发放'],
-            ['']
-        ];
-    }
 
 }
