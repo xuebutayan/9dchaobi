@@ -43,8 +43,8 @@ class MemberController extends AdminController {
             $new_where .= " m.mt4 <> '' ";
         }
         if(I('j2t5000')){
-            $where['huge_mt4'] = ['egt',100];
-            $new_where .= " m.huge_mt4 >= 100 ";
+            $where['huge_mt4'] = ['egt',5000];
+            $new_where .= " m.huge_mt4 >= 5000 ";
         }
 
         $count      =  M('Member')->where($where)->count();// 查询满足要求的总记录数
@@ -435,6 +435,94 @@ class MemberController extends AdminController {
             M('hugemt4')->where(['id'=>$id])->save ($data);
         }
         $this->ajaxReturn(['status'=>1,'info'=>'操作成功！']);
+    }
+    //会员财务统计
+    function caiwu(){
+        $page_size = intval(I('get.page_size'));
+        if($page_size){
+            cookie('page_size',$page_size);
+        }else{
+            $cookie_size = cookie('page_size');
+            $page_size = $cookie_size?$cookie_size:20;
+        }
+
+        $email = I('email');
+        $user_name = I('user_name');
+        $member_id=I('member_id');
+        $user_code = I('user_code');
+        $new_where = '';
+        if(!empty($user_name)){
+            $where['user_name'] = array('like','%'.$user_name.'%');
+            $new_where .= " m.user_name like '%$user_name%' ";
+        }
+        if(!empty($email)){
+            $where['email'] = array('like','%'.$email.'%');
+            $new_where .= " m.email like '%$email%' ";
+        }
+        if (!empty($member_id)){
+            $where['member_id']=$member_id;
+            $new_where .= " m.member_id=$member_id ";
+        }
+        if (!empty($user_code)){
+            $where['user_code']=$user_code;
+            $new_where .= " m.user_code='{$user_code}' ";
+        }
+        if(I('mt4')){
+            $where['mt4'] = ['neq',''];
+            $new_where .= " m.mt4 <> '' ";
+        }
+        if(I('j2t5000')){
+            $where['huge_mt4'] = ['egt',5000];
+            $new_where .= " m.huge_mt4 >= 5000 ";
+        }
+
+        $count      =  M('Member')->where($where)->count();// 查询满足要求的总记录数
+
+        $Page       = new Page($count,$page_size);// 实例化分页类 传入总记录数和每页显示的记录数(25)
+
+        //给分页传参数
+        setPageParameter($Page, array('email'=>$email,'member_id'=>$member_id,'user_name'=>$user_name));
+
+        $show       = $Page->show();// 分页显示输出
+
+        $list =  M('Member')->alias('m')
+            ->field("m.*,c.num as cnum")
+            ->join("__CURRENCY_USER__ c on c.member_id=m.member_id and c.currency_id=30",'LEFT')
+            ->where($new_where)
+            ->order(" m.member_id desc ")
+            ->limit($Page->firstRow.','.$Page->listRows)->select();
+
+        if($_GET['export'] ==1){
+            $levels = [0=>'无代理',1=>'基础代理',2=>'中级代理',3=>'高级代理',4=>'旗舰代理',5=>'战略代理'];
+            $data = [];
+            foreach ($list as $k=>$v) {
+                $tmp = [];
+                $tmp['id'] = $v['member_id'].'[uid:'.$v['user_id'].']';
+                $tmp['user_name'] = $v['user_name'];
+                $tmp['user_levels'] = $levels[$v['user_levels']];
+                $tmp['send_times'] = $v['send_times'];
+                $tmp['shifang'] = (string)check_jifen($v['user_id']);
+                $tmp['alps'] = $v['cnum'];
+                $tmp['edu'] = getMoney($v['member_id'],$v['user_levels']);
+                $data[] = $tmp;
+            }
+            $title = ['用户ID','用户名','用户级别','积分发放','每日积分释放数','ALPS币','额度'];
+            exportexcel($data,$title,'统计');exit;
+        }
+        $this->assign('list',$list);// 赋值数据集
+        $this->assign('page',$show);// 赋值分页输出
+        $this->display();
+    }
+    //导出excel
+    function expCaiwu(){
+        $xlsName = '用户财务统计';
+        $xlsCell = [
+            ['id','ID标识'],
+            ['user_name','用户名'],
+            ['user_levels','用户级别'],
+            ['send_times','积分发放'],
+            ['']
+        ];
     }
 
 }
