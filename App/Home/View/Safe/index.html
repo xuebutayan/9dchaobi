@@ -10,37 +10,58 @@
 <div id="main">
     <div class="main_box">
         <include file="App/Home/View/Public/left.html"/>
-        <div class="assets_content w753 right bg_w" id="safebox" style=" border-left-style:none !important;"><h1>用户中心</h1>
-            <div class="safe_center clear">
-              <div style="float:left; margin-left:20px;">
-                <div class="sc_level">
-                    <div class="sc_level_4">
-                      <img style=" width:102px; height:102px;" <if condition="$u_info['head']">src="{$u_info['head']}"<else/>src="__PUBLIC__/Home/images/ulogodefault.jpg"</if> >
-                    </div>
-                    <!--<div class="sc_level_info"></div>-->
-                </div>
-                <dl style=" padding-top:0px !important;">
-                    <span style="font-size:16px;">用户信息</span>
-                    <!--<dt>ID：<span>{$u_info['member_id']}</span></dt>-->
 
-                    <dd>姓名：{$u_info['name']}</dd>
-                    <dd >用户名：{$u_info['user_name']|default='暂无'}</dd>
-                    <dd>邮箱：{$u_info['email']}</dd>
-                    <dd>大盘编号：<if condition="$u_info['alps_code']">{$u_info['alps_code']}<else /><a href="{:U('Safe/generate_code')}">生成编号</a></if></dd>
-                    <if condition="$u_info['login']"><dd>外汇帐号：{$u_info['login']}</dd></if>
+        <div class="assets_content w753 right bg_w" id="safebox" style=" border-left-style:none !important;background:none;">
+            <div class="safe_center clear" style="padding-left:0;margin-top:1px;">
+              <div style="float:left;">
+
+                <dl style="width:275px;padding: 20px;height:118px;display:inline-block;background:#fff;margin-right:5px;margin-bottom:5px;">
+                    <!--<span style="font-size:16px;">用户信息</span>
+                    <dt>ID：<span>{$u_info['member_id']}</span></dt>-->
+
+                    <dd style="color:#f18520;font-size:14px;">您好：{$u_info['name']}</dd>
+                    <dd style="color:#333333;font-size:14px;" >用户名：{$u_info['user_name']|default='暂无'}</dd>
+                    <dd style="color:#333333;font-size:14px;">邮箱：{$u_info['email']}</dd>
+                    <dd style="color:#333333;font-size:14px;">大盘编号：<if condition="$u_info['alps_code']">{$u_info['alps_code']}<else /><a href="{:U('Safe/generate_code')}">生成编号</a></if></dd>
+
                 </dl>
               </div>
-              <div style="float:left; margin-left:40px;">
-                <dl style=" padding-top:0px !important;"><span style="font-size:16px;">人民币信息</span>
+              <style>
+              dl.top_01{width:275px;padding: 20px;padding-top: 10px;height:128px;display:inline-block;background:#fff;margin-right:5px;margin-bottom:5px;}
+			  dl.top_01 span.top_01{font-size:16px;display: block;text-align: center;border-bottom: 1px solid #eaeaea;line-height: 35px;margin-bottom: 5px;}
+			  div.ziliao{float:left;width:955px;line-height:45px;font-size:16px;background:#fff;margin-bottom:5px;margin-top:15px;}
+              </style>
+              <div style="float:left;">
+                <dl class="top_01">
+                    <span class="top_01">ALPS MT4</span>
+
+                    <dd style="color:#333333;" >储备金：{$u_info['alps_mt4']}个</dd>
+                    <if condition="$u_info['login']"><dd style="color:#333333;">A仓帐户：{$u_info['login']}</dd></if>
+                    <dd style="color:#333333;" >外汇总出账：{$chubi}美元</dd>
+                </dl>
+              </div>
+              <div style="float:left;">
+                <dl class="top_01">
+                    <span class="top_01">J2T MT4</span>
+
+                    <dd style="color:#333333;" >储备金：${$u_info['huge_mt4']}美元</dd>
+                    <dd style="color:#333333;">B仓账户1：{$code[0]|default='暂无'}</dd>
+                    <dd style="color:#333333;">B仓账户2：{$code[1]|default='暂无'}</dd>
+                </dl>
+              </div>
+              <div class="ziliao"><img src="/Public/Home/images/dian.png" style="margin-left:20px;width:8px; height:8px; margin-right:10px;"><a class="current">个人资料
+                </a></div>
+              <div style="float:left;">
+                <dl class="top_01"><span class="top_01">人民币信息</span>
                     <dt>可用：￥{$u_info['rmb']|floatval=###}</span></dt>
                     <dd>冻结：￥{$u_info['forzen_rmb']|floatval=###}</dd>
                     <dd>总资产：￥{$u_info['rmb']+$u_info['forzen_rmb']|floatval=###}</dd>
-                    <dd>J2T MT4:${$u_info['huge_mt4']} 美元</dd>
-                    <dd>ALPS MT4:{$u_info['alps_mt4']} 个</dd>
+                    <!--<dd>J2T MT4:${$u_info['huge_mt4']} 美元</dd>
+                    <dd>ALPS MT4:{$u_info['alps_mt4']} 个</dd>-->
                 </dl>
               </div>
-              <div style="float:left; margin-left:40px;">
-                <dl style=" padding-top:0px !important;"><span style="font-size:16px;">交易积分</span>
+              <div style="float:left;">
+                <dl class="top_01"><span class="top_01">交易积分</span>
                    <dd>可用积分：{$u_info['integrals']}</dd>
                    <dd>交易冻结：{$u_info['forzen_integrals']}</dd>
                    <dd>大盘赠送：{$pan.total} 已释放：{$pan.send}</dd>
@@ -48,28 +69,28 @@
                 </dl>
               </div>
               <!--阿尔卑斯信息-->
-              <div style="float:left; margin-left:40px;">
-                <dl style=" padding-top:0px !important;"><span style="font-size:16px;">阿尔卑斯信息</span>
+              <div style="float:left;">
+                <dl class="top_01"><span class="top_01">阿尔卑斯信息</span>
                     <dt>可用：{$alps_info['num']}</span></dt>
                     <dd>冻结：{$alps_info['forzen_num']}</dd>
                     <dd>总资产：{$alps_info['num']+$alps_info['forzen_num']}</dd>
                 </dl>
               </div>
             </div>
-            <ul class="sc_statu">
-                <li>
+            <ul class="sc_statu" style="width:100%;">
+                <li style="width:423px;margin-right:5px;background:#fff;">
                     <if condition="$u_info['status'] eq 0 ">
                         <em class="sc_statu_type_1_1"></em>
                         <dl>
                             <dt>实名认证</dt>
-                            <dd class="nopass">未认证<a href="{:U('ModifyMember/modify')}">点击认证</a></dd>
+                            <dd class="nopass">未认证<a href="{:U('ModifyMember/modify')}" style="margin-left: 179px;">点击认证</a></dd>
 
                         </dl>
                         <else/>
                         <em class="sc_statu_type_1"></em>
                         <dl>
                             <dt>实名认证</dt>
-                            <dd class="alpass">已认证<a href="{:U('User/updateMassage')}">查看</a></dd>
+                            <dd class="alpass">已认证<a href="{:U('User/updateMassage')}" style="margin-left: 179px;">查看详情</a></dd>
                         </dl>
                     </if>
                 </li>
@@ -89,15 +110,15 @@
                     </if>
 
                 </li>-->
-                <li>
+                <li style="width:423px;background:#fff;">
                     <em class="sc_statu_type_2"></em>
                     <dl>
                         <dt>账户资产</dt>
-                        <dd class="alpass">已认证<a href="{:U('User/index')}">点击进入</a></dd>
+                        <dd class="alpass">已认证<a href="{:U('User/index')}" style="margin-left: 179px;">点击进入</a></dd>
                     </dl>
                 </li>
             </ul>
-            <div class="sc_info_list" id="sc_info_list">
+            <div class="sc_info_list" id="sc_info_list" style="width:100%;border-top:none;">
                 <dl style="background-color: rgb(249, 249, 249);">
                     <dt>登录密码</dt>
                     <dd><p>登录{$config['name']}账户时需要输入的密码</p></dd>

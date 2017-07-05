@@ -277,7 +277,7 @@ function zfb(){
                 </tr>
                 <tr>
                   <td></td>
-                  <td><input style=" float:right; margin-right:103px;" class="confirm"  value="确认提交" type="submit"></td>
+                  <td><input id="tx_btn" style=" float:right; margin-right:103px;" class="confirm"  value="确认提交" type="submit"></td>
                 </tr>
               </tbody>
             </table>
@@ -304,6 +304,7 @@ function zfb(){
 					//code:"请填写验证码",
 				},
 				submitHandler:function(form){
+          $('#tx_btn').attr('disabled',true);
 					ajax_submit_form(form)
 					return false;
 				},

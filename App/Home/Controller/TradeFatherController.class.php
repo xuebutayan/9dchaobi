@@ -27,7 +27,7 @@ class TradeFatherController extends CommonController {
 	 * 设置订单状态
 	 * @param int $status  0 1 2 -1
 	 * @param int $orders_id 订单id
-	 * @return  boolean  
+	 * @return  boolean
 	 */
 	protected function setOrdersStatusByOrdersId($status,$orders_id){
 	    return M('Orders')->where("orders_id=$orders_id")->setField('status',$status);
@@ -65,7 +65,7 @@ class TradeFatherController extends CommonController {
 	        M()->rollback();
 	        $info['status'] = -1;
 	        $info['info'] = '撤销失败';
-	
+
 	        return $info;
 	    }
 	}

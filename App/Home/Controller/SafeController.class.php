@@ -29,6 +29,12 @@ class SafeController extends HomeController {
         }
         //alps币
         $alps = M('currency_user')->where(['member_id'=>$_SESSION['USER_KEY_ID'],'currency_id'=>30])->find();
+        //B仓帐号
+        $code = M('hugemt4')->where(['member_id'=>$_SESSION['USER_KEY_ID']])->getField('huge_user',true);
+        //外汇出币统计
+        $dollar = M('alps_log')->where(['member_id'=>$_SESSION['USER_KEY_ID'],'platform'=>'waihui','status'=>1,'type'=>1])->sum('money');
+        $this->assign('chubi',$dollar);
+        $this->assign('code',$code);
         $this->assign('alps_info',$alps);
         $this->assign('pan',$pan);
         $this->assign('u_info',$u_info);
