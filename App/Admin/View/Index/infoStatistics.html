@@ -72,9 +72,13 @@
         </div>
         <div class="result-content">
         <p>今日应发放 {$baodan_count} 人,已发放 {$baowan} 人 <a target="_blank" href="{:U('Index/baowan?detail=1')}">详情</a> , <a target="_blank" href="{:U('Index/bubao')}">执行补充发放</a><!-- ,<a href="{:U('Index/reset')}">重置发放</a> --></p>
-        <br><br>
+        <br>
             <if condition="F('mission')">今日已执行发放<else /><a href="javascript:collect(1)">执行任务</a></if>
             <br />
+            <br>
+            起始ID:<input size="10" type="text" id='qujian1' onkeyup="value=value.replace(/[^\d]/g,'');"><br>
+            结束ID:<input size="10" type="text" id='qujian2' onkeyup="value=value.replace(/[^\d]/g,'');"><br>
+            <a href="javascript:;" onclick="collectq(1)">代理ID区间释放</a>
             <!-- <a href="javascript:collect(1)">提示测试</a> -->
         </div>
     </div>
@@ -121,6 +125,33 @@ function collect_page(p){
             var index = layer.msg(result.info,{id:'msg',shade:0.3});
             p++;
             setTimeout("collect_page("+ p +")",1000);
+        }else{
+            layer.close(index);
+            alert(result.info);
+            window.location.reload();
+        }
+    });
+}
+function collectq(p){
+    var x = $('#qujian1').val();
+    var y = $('#qujian2').val();
+    //alert(v);
+    $.getJSON(url, {p:p,x:x,y:y}, function(result){
+        if(result.status == 1){
+            layer.msg(result.info,{id:'msg',shade:0.3});
+            p++;
+            setTimeout("collectq_page("+ p +","+ x +","+y+")",1000);
+        }else{
+            alert(result.info);
+        }
+    });
+}
+function collectq_page(p,x,y){
+    $.getJSON(url, {p:p,x:x,y:y}, function(result){
+        if(result.status == 1){
+            var index = layer.msg(result.info,{id:'msg',shade:0.3});
+            p++;
+            setTimeout("collectq_page("+ p +","+ x +","+y+")",1000);
         }else{
             layer.close(index);
             alert(result.info);

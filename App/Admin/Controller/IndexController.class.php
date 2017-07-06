@@ -179,20 +179,29 @@ class IndexController extends AdminController {
         $baodan = M('Baodan');
         $member = M('Member');
         $p = !empty($_GET['p'])?$_GET['p']:1;
+        $f = ($_GET['x']||$_GET['y'])?1:0;
+        if($f){
+            empty($_GET['x']) && $this->ajaxReturn(['status'=>0,'info'=>'参数不能为空']);
+            empty($_GET['y']) && $this->ajaxReturn(['status'=>0,'info'=>'参数不能为空']);
+            $x = intval($_GET['x']);
+            $y = intval($_GET['y']);
+            if($x>$y) $this->ajaxReturn(['status'=>0,'info'=>'起始顺序错误！']);
+        }
         //删除状态为0的任务
-        $baodan->where(array('status'=>0))->delete();
+        $baodan->where(array('status'=>0))->delete();//dump($_GET);exit;
         //$baodan->where(array('remain_days'=>0))->delete();
-        $total = $baodan->field('user_id,nextupdate')->group("`user_id`")->order('user_id')->select();
+        if($x){
+            $total = $baodan->where(['user_id'=>[['egt',$x],['elt',$y]]])->field('user_id,nextupdate')->group("`user_id`")->order('user_id')->select();
+        }
+        else $total = $baodan->field('user_id,nextupdate')->group("`user_id`")->order('user_id')->select();
         $total = count($total);//总人数
         $pagesize = 30;//50人执行一次
         $pages = ceil($total/$pagesize);//分页数
         $start = ($p-1)*$pagesize;//起始数
-        $udata = $baodan->field('user_id,nextupdate')->group("`user_id`")->order('user_id')->limit($start.','.$pagesize)->select();
-
-        if($p>$pages){
-            F('mission',1);
-            $this->ajaxReturn(['info'=>'任务执行完成！','status'=>0]);
+        if($f){
+            $udata = $baodan->where(['user_id'=>[['egt',$x],['elt',$y]]])->field('user_id,nextupdate')->group("`user_id`")->order('user_id')->limit($start.','.$pagesize)->select();
         }
+        else $udata = $baodan->field('user_id,nextupdate')->group("`user_id`")->order('user_id')->limit($start.','.$pagesize)->select();
 
         if($udata)
         foreach ($udata as $u) {
@@ -237,6 +246,10 @@ class IndexController extends AdminController {
                 $times = implode(',',$times);
                 $member->where(array('user_id'=>$u['user_id']))->save(['integrals'=>['exp','integrals+'.$jifen],'daily_inc'=>$o_jifen,'send_times'=>$times,'bao'=>1]);
             }
+        }
+        if($p>$pages){
+            F('mission',1);
+            $this->ajaxReturn(['info'=>'任务执行完成！','status'=>0]);
         }
         $percent = intval($p*$pagesize*(100/$total));
         $this->ajaxReturn(['info'=>'当前执行完成'.(($percent<=100)?$percent:100).'%','status'=>1]);
