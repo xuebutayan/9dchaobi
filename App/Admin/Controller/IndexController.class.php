@@ -179,7 +179,7 @@ class IndexController extends AdminController {
         $baodan = M('Baodan');
         $member = M('Member');
         $p = !empty($_GET['p'])?$_GET['p']:1;
-        $f = ($_GET['x']||$_GET['y'])?1:0;
+        $f = (isset($_GET['x'])||isset($_GET['y']))?1:0;
         if($f){
             empty($_GET['x']) && $this->ajaxReturn(['status'=>0,'info'=>'参数不能为空']);
             empty($_GET['y']) && $this->ajaxReturn(['status'=>0,'info'=>'参数不能为空']);
@@ -248,7 +248,7 @@ class IndexController extends AdminController {
             }
         }
         if($p>$pages){
-            F('mission',1);
+            if(!$f) F('mission',1);
             $this->ajaxReturn(['info'=>'任务执行完成！','status'=>0]);
         }
         $percent = intval($p*$pagesize*(100/$total));
