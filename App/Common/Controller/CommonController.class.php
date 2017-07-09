@@ -481,6 +481,34 @@ class CommonController extends Controller {
         $re = $log->add($data);
         return $re;
      }
+     /**
+      * 更加快捷的设置用户资金
+      * @param  [type] $member_id  [description]
+      * @param  [type] $money_type 币种：1积分2人民币3虚拟币
+      * @param  [type] $num        [description]
+      * @param  [type] $currency_id 虚拟币id
+      * @return [type]             [description]
+      */
+     protected function moneyHandle($member_id,$money_type,$num,$currency_id){
+        $member = M('member');
+        switch ($money_type) {
+            case '1'://积分
+                $msg = $member->where(['member_id'=>$member_id])->save(['integrals'=>['exp','integrals-'.$num],'forzen_integrals'=>['exp','forzen_integrals+'.$num]]);
+                $re = $this->inte_log($member_id,$num,2);
+                $msg = $msg && $re;
+                break;
+            case '2'://人民币
+                $msg = $member->where(['member_id'=>$member_id])->save(['rmb'=>['exp','rmb-'.$num],'forzen_rmb'=>['exp','forzen_rmb+'.$num]]);
+                break;
+            case '3'://虚拟币
+                $msg = M('currency_user')->where(['member_id'=>$member_id,'currency_id'=>$currency_id])->save(['num'=>['exp','num-'.$num],'forzen_num'=>['exp','forzen_num+'.$num]]);
+                break;
+            default:
+                return false;
+        }
+
+        return $msg;
+     }
 
      /**
       * 设置账户资金

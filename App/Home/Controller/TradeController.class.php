@@ -121,14 +121,12 @@ class TradeController extends TradeFatherController
         $trade_money = $buynum * $buyprice; //*(1+($currency['currency_buy_fee']/100));
         if($_POST['jifen']==1){
             //操作账户
-            $r[] = $this->setUserMoney($this->member['member_id'], 1, $trade_money, 'dec', 'num');
-            $r[] = $this->setUserMoney($this->member['member_id'], 1, $trade_money, 'inc', 'forzen_num');
+            $r[] = $this->moneyHandle($this->member['member_id'],1,$trade_money);
             //挂单流程
             $r[] = $this->guadan($buynum, $buyprice, 'buy', $currency,1);
         }else{
             //操作账户
-            $r[] = $this->setUserMoney($this->member['member_id'], $currency['trade_currency_id'], $trade_money, 'dec', 'num');
-            $r[] = $this->setUserMoney($this->member['member_id'], $currency['trade_currency_id'], $trade_money, 'inc', 'forzen_num');
+            $r[] = $this->moneyHandle($this->member['member_id'],2,$trade_money);
             //挂单流程
             $r[] = $this->guadan($buynum, $buyprice, 'buy', $currency);
         }
@@ -265,8 +263,7 @@ class TradeController extends TradeFatherController
             $sellnum = $sellnum/2;
             $r[] = $this->alps_mt4($this->member['member_id'],$sellnum,$currency['currency_id']);
         }
-        $r[] = $this->setUserMoney($this->member['member_id'], $currency['currency_id'], $sellnum, 'dec', 'num');
-        $r[] = $this->setUserMoney($this->member['member_id'], $currency['currency_id'], $sellnum, 'inc', 'forzen_num');
+        $r[] = $this->moneyHandle($this->member['member_id'],3,$sellnum,$currency['currency_id']);
         //写入数据库
         $r[] = $this->guadan($sellnum, $sellprice, 'sell', $currency);
         //成交
