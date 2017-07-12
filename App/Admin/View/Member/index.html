@@ -41,13 +41,14 @@
                         <th>会员邮箱</th>
                         <th>用户名</th>
                         <th>积分发放/次</th>
-						<th>推荐人</th>
+
                         <th>会员姓名</th>
                         <th>手机号</th>
                         <th width="70">ALPS币</th>
                         <th>账户余额</th>
                         <th>账户积分</th>
                         <th>冻结金钱</th>
+                        <th>外汇储备</th>
 						<th>注册时间</th>
                         <th>状态</th>
                         <th>操作</th>
@@ -58,7 +59,7 @@
                             <td><if condition="$vo['user_id']"><font color="#f00"><b>{$vo['email']}</b></font><else />{$vo['email']}</if></td>
                             <td><if condition="$vo['user_id']"><font color="#f00"><b>{$vo['user_name']}</b></font><else />{$vo['user_name']}</if></td>
                             <td>{$vo['send_times']|default="暂无"}</td>
-							<td>{$vo['pid']}</td>
+
                             <td>{$vo['name']}</td>
                             <td>{$vo['phone']}</td>
                             <td>{$vo.cnum|default=0}<br>
@@ -68,6 +69,7 @@
                             <td>{$vo['rmb']}</td>
                             <td>{$vo['integrals']}</td>
                             <td>{$vo['forzen_rmb']}</td>
+                            <td>{$vo['waihui']}</td>
 							<td>{$vo['reg_time']|date='Y-m-d H:i:s',###}</td>
                             <td><if condition="$vo['status'] eq 1">
 									正常

@@ -164,13 +164,14 @@ class MemberController extends AdminController {
             $where['member_id'] = $member_id;
             $list = $M_member->where($where)->find();
             //检查金额、冻结金额、积分有没有变化
-            if($_POST['rmb']!=$list['rmb'] || $_POST['forzen_rmb']!=$list['forzen_rmb']||$_POST['integrals']!=$list['integrals']){
+            if($_POST['rmb']!=$list['rmb'] || $_POST['forzen_rmb']!=$list['forzen_rmb']||$_POST['integrals']!=$list['integrals'] || $_POST['waihui']!=$list['waihui']){
                 $data['admin'] = $this->admin['username'];
                 $data['member_id'] = $list['member_id'];
                 $data['user_name'] = $list['user_name'];
                 $data['rmb'] = $_POST['rmb']-$list['rmb'];
                 $data['forzen_rmb'] = $_POST['forzen_rmb']-$list['forzen_rmb'];
                 $data['integrals'] = $_POST['integrals']-$list['integrals'];
+                $data['waihui'] = $_POST['waihui']-$list['waihui'];
                 $data['addtime'] = time();
 
                 M('member_log')->add($data);

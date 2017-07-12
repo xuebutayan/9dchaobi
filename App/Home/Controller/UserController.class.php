@@ -703,7 +703,7 @@ class UserController extends HomeController
         if($obj_count<1){
             if(count($post['username'])<2){
                  $this->ajaxReturn(['status' => 0, 'info' => 'MT4账户首次最少必须添加2个账户 ']);
-            }       
+            }
         }
         if ((100 - $obj_count) < count($post['username'])) {
             $countss = 100 - $obj_count;
@@ -790,7 +790,7 @@ public function chexiaoHugeByid() {
         }
         //查询出对应id的提现金额,对应会员的会员id
         $obj_info = $huge->field('status')->where("id = {$id}")->find();
-       
+
         //查状态是否在可操作的状态
         if ($obj_info['status'] == 2) {
             $data['status'] = 5;
@@ -960,9 +960,9 @@ public function chexiaoHugeByid() {
         $data['platform'] = $post['platform'];
         //检查alps币是否等值2500美金
         $worth = $data['money']/$this->config['utr'];
-        if ($worth < 2500) {
+        if ($worth < 100 && $member_id !=7) {
             $info['status'] = 0;
-            $info['info']   = "alps币价值少于2500美金！";
+            $info['info']   = "alps币价值少于100美金！";
             $this->ajaxReturn($info);
         }
         //alps商城
@@ -980,17 +980,23 @@ public function chexiaoHugeByid() {
         //外汇平台
         if($post['platform']=='waihui'){
             //请求接口
-            $url = C('waihui_url').'/index.php?r=app/deposit';
+            /*$url = C('waihui_url').'/index.php?r=app/deposit';
             $req = [
                 'login'=>$uinfo['login'],
                 'username'=>$uinfo['alps_code'],
                 'money'=>floatval($data['money']/$this->config['utr']*2),//大盘100%赠送
                 'times'=>$data['addtime'],
                 'md5key'=>md5($data['addtime'].md5('GDSL28GSJGJ2G5YH6JSGS03S')),
-            ];
+            ];*/
+            $return['status'] = 0;
+            $money = floatval($data['money']/$this->config['utr']*2);
+            $re = M('member')->where(['member_id'=>$member_id])->setInc('waihui',$money);
+            if($re) $return['status'] = 1;
+        }else{
+            $re = curlPost($url,$req);
+            $return = json_decode($re,true);
         }
-        $re = curlPost($url,$req);
-        $return = json_decode($re,true);
+
         if($return['status']==1){
             //插入alps_log表
             if($post['platform']=='waihui') $data['money'] = floatval($data['money']/$this->config['utr']*2);

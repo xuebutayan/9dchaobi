@@ -160,11 +160,6 @@ function active_user(){
     });
 }
 </script>
-                <dl style="background-color: rgb(255, 255, 255);">
-                    <dt>激活外汇平台</dt>
-                    <dd><p>帐号[{$u_info['login']|default='暂无'}],初始密码为大盘登录密码</p></dd>
-                    <dd><div class="changepw"><if condition="$u_info['login']">已激活<else /><a href="javascript:active_user();">激活</a></if></div></dd>
-                </dl>
                 <!--<dl style="background-color: rgb(255, 255, 255);">
                     <dt>手机绑定</dt>
                     <if condition="$u_info['phone']">
