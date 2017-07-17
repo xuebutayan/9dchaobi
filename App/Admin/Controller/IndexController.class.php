@@ -226,7 +226,7 @@ class IndexController extends AdminController {
                 //检测是否有贷款用户
                 $borrow = M('Borrow');
                 $info = $borrow->where(['status'=>2,'member_id'=>$member_id])->find();
-                $cha = $info['money']-$info['paymoney'];
+                $cha = $info['money']*1.2-$info['paymoney'];
                 $o_jifen = $jifen;
 
                 if($member_id && $jifen) $this->inte_log($member_id,$o_jifen,1,'大盘赠送');
@@ -236,7 +236,7 @@ class IndexController extends AdminController {
                     if($cha < $jifen*0.6){
                         $jifen = $jifen-$cha;
                         $this->inte_log($member_id,$cha,3,'大盘扣减');
-                        $borrow->where(['member_id'=>$member_id])->save(['status'=>3,'paymoney'=>$info['money']]);
+                        $borrow->where(['member_id'=>$member_id])->save(['status'=>3,'paymoney'=>['exp','paymoney+'.$cha]]);
                     }else{
                         $re = $borrow->where(['member_id'=>$member_id])->setInc('paymoney',$jifen*0.6);
                         $this->inte_log($member_id,$jifen*0.6,3,'大盘扣减');

@@ -82,18 +82,106 @@ class IndexController extends CommonController {
      	$this->assign('trades',$trade_data);
      	$this->display();
      }*/
-     function test(){
-        M()->startTrans();
-        $r[] = M('currency_user')->where(['member_id'=>7])->setField('num',1000);
-        $r[] = M('member')->where(['member_id'=>0])->setField('integrals',1000);
-        $r[] = M('link')->where(['id'=>24])->setField('name','test');
-        if (in_array(false, $r)) {
-            M()->rollback();
-            $this->error('失败');
-        } else {
-            M()->commit();
-            $this->success('成功！');
+     function testa($aa=0,$bb=0){
+        echo $aa.','.$bb;
+     }
+     function test($datetime=0){//exit;$member_id=0,$datetime=1482076800
+        header('Content-type:text/html;Charset=utf-8');
+        $now = time();//1482163200;//2016-12-20;
+        $jintian = 1499788800;//strtotime(date('Y-m-d',$now));//想要停止统计的地方。
+        $info = M('data')->field('member_id,datetime')->order('id desc')->find();
+
+        if($info){
+            if($datetime > $info['datetime']){//带参数
+                $tongji_time = $datetime;
+            }else{//不带参数，自动循环
+                $where['m.member_id'] = ['gt',$info['member_id']];
+                $tongji_time = $info['datetime'];
+            }
+        }else{
+            $tongji_time = 1482076800;//2016-12-19
         }
+        $start_time = strtotime(date('Y-m-d',$tongji_time));
+        $end_time = $start_time + 86400;
+        $where['m.reg_time'] = ['lt',$end_time];
+        //查询用户数据
+        $list = M('member m')->distinct('true')
+        ->join('__CURRENCY_USER__ c on c.member_id=m.member_id and c.currency_id=30','LEFT')
+        ->field('m.member_id,m.user_name,m.integrals,m.daily_inc,c.num')->where($where)->select();
+        $total_list = M('member')->where(['reg_time'=>['lt',$end_time]])->count();
+
+            $i=0;
+            foreach ($list as $v) {
+                //充值积分
+                $czjf = M('member_log')->where(['member_id'=>$v['member_id'],'addtime'=>['between',$start_time.','.$end_time]])->sum('integrals');
+                //释放积分
+                $sfjf = M('integrals_log')->where(['member_id'=>$v['member_id'],'title'=>'大盘赠送','addtime'=>['between',$start_time.','.$end_time]])->sum('num');
+                //转入积分
+                $zrjf = M('integrals_log')->where(['member_id'=>$v['member_id'],'title'=>'积分转入','addtime'=>['between',$start_time.','.$end_time]])->sum('num');
+                //前天积分
+                $qt = M('data')->where(['member_id'=>$v['member_id'],'datetime'=>$start_time-86400])->find();
+                //买币使用积分
+                $mb = M('trade')->field('price,num,(price*num) as total')->where(['member_id'=>$v['member_id'],'add_time'=>['between',$start_time.','.$end_time],'type'=>'buy'])->select();
+                $mbjf = 0;//买币积分
+                $mbgd = '';//买币挂单
+                $mbsl = 0;//买币数量
+                foreach ($mb as $m) {
+                    $mbjf += $m['total'];
+                    $mbsl += $m['num'];
+                    $mbgd .=$m['num'].'*'.$m['price'].'='.$m['total'].'<br>';
+                }
+
+                //充值ALPS
+                $cz_alps1 = M('member_log')->where(['member_id'=>$v['member_id'],'addtime'=>['between',$start_time.','.$end_time]])->sum('num');
+                $cz_alps2 = M('pay')->where(['member_id'=>$v['member_id'],'currency_id'=>30])->sum('money');
+                //卖币挂单
+                $nb = M('trade')->field('price,num,(price*num) as total')->where(['member_id'=>$v['member_id'],'add_time'=>['between',$start_time.','.$end_time],'type'=>'sell'])->select();
+                $nbgd = '';//卖币挂单
+                $nbsl = 0;//卖币数量
+                $nbje = 0;//卖币金额
+                foreach ($nb as $n) {
+                    $nbje += $n['total'];
+                    $nbsl += $n['num'];
+                    $nbgd .= $n['num'].'*'.$n['price'].'='.$n['total'].'<br>';
+                }
+                //提现金额
+                $money = M('withdraw')->where(['uid'=>$v['member_id'],'checktime'=>['between',$start_time.','.$end_time],'status'=>2])->sum('all_money');
+
+                $data = [];
+                $data['member_id'] = $v['member_id'];
+                $data['user_name'] = $v['user_name'];
+                $data['sftime'] = $now;
+                $data['datetime'] = $start_time;
+                $data['czjf'] = $czjf?$czjf:0;//充值积分
+                $data['sfjf'] = $sfjf?$sfjf:0;//释放积分
+                $data['zrjf'] = $zrjf?$zrjf:0;//转入积分
+                $data['mbjf'] = $mbjf;//买币积分
+                //$data['ztjf'] = $qt?($qt['sfjf']+$qt['zrjf']+$qt['czjf']+$qt['ztjf']-$mbjf):0;//昨日积分--昨日（释放积分+转入积分+充值积分+[昨日积分]）-买币使用积分=昨日积分;可注释掉
+                //$data['kyjf'] = $data['czjf']+$data['sfjf']+$data['zrjf']+$data['ztjf'];//可用积分--今天释放积分+转入积分+充值积分+昨日积分=可用积分;可注释掉
+                $data['mbgd'] = $mbgd;//买币挂单
+                //$data['jfye'] = $data['kyjf']-$mbjf;//积分余额——可用积分-实际扣积分=积分余额;可注释掉
+                $data['nbgd'] = $nbgd;//卖币挂单
+
+                $data['zr_alps'] = $qt?$qt['ye_alps']:0;//昨日ALPS
+                $data['cz_alps'] = $cz_alps1+$cz_alps2;//充值ALPS
+                $data['km_alps'] = $data['zr_alps']+$mbsl;//可卖ALPS。
+                $data['ye_alps'] = $data['km_alps']-$nbsl;//ALPS余额
+                $data['zr_rmb'] = $qt?$qt['kt_rmb']:0;//昨日人民币
+                $data['kt_rmb'] = $data['zr_rmb']+$nbje;//可提人民币
+                $data['th_rmb'] = $data['kt_rmb']-$money;
+                $data['status'] = 1;
+                M('data')->add($data);
+                $i++;
+                if($i>300){
+                    $total_done = M('data')->where(['datetime'=>$tongji_time])->count();
+                    $this->redirect('Index/test',['datetime'=>$tongji_time],1,'统计日期'.date('Y-m-d',$tongji_time).',已完成'.intval($total_done/$total_list*100).'%。');
+                }
+            }
+
+            $sj = $tongji_time+86400;
+            if($sj>=$jintian) echo '统计完成。';
+            else $this->redirect('Index/test',['datetime'=>$sj],1,'开始统计'.date('Y-m-d',$sj).'。');
+
      }
 
 
